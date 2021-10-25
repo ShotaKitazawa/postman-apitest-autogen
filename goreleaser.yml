@@ -9,8 +9,8 @@ builds:
     binary: postman-apitest-autogen
     ldflags:
       - -s -w
-      - -X main.appName=postman-apitest-autogen
-      - -X main.appVersion="{{.Version}} ({{.ShortCommit}})"
+      - -X main.appName="postman-apitest-autogen"
+      - -X main.appVersion="{{.Version}}({{.ShortCommit}})"
     env:
       - CGO_ENABLED=0
     goarch:
