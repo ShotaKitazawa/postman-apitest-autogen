@@ -1,17 +1,17 @@
 package model
 
 import (
+	"encoding/json"
 	"os"
 
 	"github.com/Jeffail/gabs/v2"
-	"gopkg.in/yaml.v2"
 )
 
 type Filters []Filter
 
 type Filter struct {
-	Testname          string `yaml:"testname"`
-	IgnoreJSONPointer string `yaml:"ignoreJSONPointer"`
+	Testname          string `json:"testname"`
+	IgnoreJSONPointer string `json:"ignoreJSONPointer"`
 }
 
 func NewFilterFromFile(filepath string) (*Filters, error) {
@@ -24,7 +24,7 @@ func NewFilterFromFile(filepath string) (*Filters, error) {
 	}
 
 	var f Filters
-	if err := yaml.Unmarshal(data, &f); err != nil {
+	if err := json.Unmarshal(data, &f); err != nil {
 		return nil, err
 	}
 	return &f, nil

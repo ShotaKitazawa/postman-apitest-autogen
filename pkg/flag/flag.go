@@ -14,7 +14,7 @@ type Args struct {
 
 func Parse(name, version string) Args {
 	c := flag.String("collection-file", "", "filepath of postman_collection.json")
-	f := flag.String("filter-file", "", "filepath of filter.yaml")
+	f := flag.String("filter-file", "", "filepath of filter.json")
 	o := flag.String("output-file", "output.json", "filepath of output_collection.json")
 	v := flag.Bool("version", false, "display version")
 	flag.Parse()
