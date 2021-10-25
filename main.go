@@ -9,8 +9,13 @@ import (
 	"github.com/ShotaKitazawa/postman-apitest-autogen/pkg/model"
 )
 
+var (
+	appName string
+	appVersion string
+)
+
 func main() {
-	args := myflag.Parse()
+	args := myflag.Parse(appName, appVersion)
 	c, err := model.NewCollectionFromFile(args.CollectionFile)
 	if err != nil {
 		log.Fatal(err)
