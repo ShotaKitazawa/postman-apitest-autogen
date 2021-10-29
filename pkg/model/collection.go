@@ -7,6 +7,18 @@ import (
 	"strings"
 )
 
+// CollectionBase
+
+type CollectionBase struct {
+	Info CollectionInfo   `json:"info"`
+	Item []CollectionItem `json:"item"` // TODO: support ItemGroup (aka. folder)
+	// untouch fields
+	Event                   json.RawMessage `json:"event"`
+	Variable                json.RawMessage `json:"variable"`
+	Auth                    json.RawMessage `json:"auth"`
+	ProtocolProfileBehavior json.RawMessage `json:"protocolProfileBehavior"`
+}
+
 func NewCollectionFromFile(filepath string) (*CollectionBase, error) {
 	data, err := os.ReadFile(filepath)
 	if err != nil {
@@ -22,11 +34,6 @@ func NewCollectionFromFile(filepath string) (*CollectionBase, error) {
 	return &c, nil
 }
 
-type CollectionBase struct {
-	Info CollectionInfo   `json:"info"`
-	Item []CollectionItem `json:"item"`
-}
-
 func (b CollectionBase) IsValidVersion() bool {
 	var expectedVersions = []string{
 		"https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -40,17 +47,29 @@ func (b CollectionBase) IsValidVersion() bool {
 	return false
 }
 
+// CollectionInfo
+
 type CollectionInfo struct {
-	PostmanID string `json:"_postman_id"`
-	Name      string `json:"name"`
-	Schema    string `json:"schema"`
+	Name   string `json:"name"`
+	Schema string `json:"schema"`
+	// untouch fields
+	PostmanID   json.RawMessage `json:"_postman_id"`
+	Description json.RawMessage `json:"description"`
+	Version     json.RawMessage `json:"version"`
 }
+
+// CollectionItem
 
 type CollectionItem struct {
 	Name      string               `json:"name"`
 	Events    []CollectionEvent    `json:"event,omitempty"`
-	Request   CollectionRequest    `json:"request,omitempty"`
 	Responses []CollectionResponse `json:"response"`
+	// untouch fields
+	ID                      json.RawMessage `json:"id"`
+	Description             json.RawMessage `json:"description"`
+	Variable                json.RawMessage `json:"variable"`
+	Request                 json.RawMessage `json:"request,omitempty"`
+	ProtocolProfileBehavior json.RawMessage `json:"protocolProfileBehavior"`
 }
 
 func (i CollectionItem) IsJsonResponse() bool {
@@ -68,66 +87,49 @@ func (i CollectionItem) IsOnlyOnceResponse() bool {
 	return len(i.Responses) == 1
 }
 
+// CollectionEvent
+
 type CollectionEvent struct {
-	Listen string           `json:"listen"`
-	Script CollectionScript `json:"script"`
+	Listen string `json:"listen"`
+	Script struct {
+		Execes []string `json:"exec"`
+		Type   string   `json:"type"`
+	} `json:"script"`
 }
 
 func NewCollectionEvent(test string) CollectionEvent {
 	return CollectionEvent{
 		Listen: "test",
-		Script: CollectionScript{
+		Script: struct {
+			Execes []string `json:"exec"`
+			Type   string   `json:"type"`
+		}{
 			Execes: []string{test},
 			Type:   "text/javascript",
 		},
 	}
 }
 
-type CollectionScript struct {
-	Execes []string `json:"exec"`
-	Type   string   `json:"type"`
-}
-
-type CollectionRequest struct {
-	Method  string                `json:"method"`
-	Headers []CollectionKV        `json:"header"`
-	URL     CollectionURL         `json:"url"`
-	Body    CollectionRequestBody `json:"body,omitempty"`
-}
-
-type CollectionRequestBody struct {
-	Mode string `json:"mode"`
-	Raw  string `json:"raw"`
-}
+// CollectionResponse
 
 type CollectionResponse struct {
-	Name                   string             `json:"name"`
-	OriginalRequest        CollectionRequest  `json:"originalRequest"`
-	Status                 string             `json:"status"`
-	Code                   int                `json:"code"`
-	PostmanPreviewlanguage string             `json:"_postman_previewlanguage"`
-	Headers                []CollectionKV     `json:"header"`
-	Cookies                []CollectionCookie `json:"cookie"`
-	Body                   string             `json:"body"`
+	Name    string         `json:"name"`
+	Headers []CollectionKV `json:"header"`
+	Body    string         `json:"body"`
+	Code    int            `json:"code"`
+	// untouch fields
+	ID                     json.RawMessage `json:"id"`
+	OriginalRequest        json.RawMessage `json:"originalRequest"`
+	ResponseTime           json.RawMessage `json:"responseTime"`
+	Timings                json.RawMessage `json:"timings"`
+	Cookies                json.RawMessage `json:"cookie"`
+	Status                 string          `json:"status"`
+	PostmanPreviewlanguage string          `json:"_postman_previewlanguage"`
 }
 
 func (c CollectionResponse) GetBody() []byte {
 	return json.RawMessage([]byte(c.Body))
 }
-
-type CollectionURL struct {
-	Raw      string         `json:"raw"`
-	Protocol string         `json:"protocol"`
-	Host     []string       `json:"host"`
-	Port     string         `json:"port"`
-	Path     []string       `json:"path"`
-	Query    []CollectionKV `json:"query,omitempty"`
-}
-
-type CollectionURLQuery struct {
-}
-
-type CollectionCookie map[string]string
 
 type CollectionKV struct {
 	Key   string      `json:"key"`
