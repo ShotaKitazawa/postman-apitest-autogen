@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	appName string
+	appName    string
 	appVersion string
 )
 
